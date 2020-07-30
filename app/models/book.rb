@@ -20,15 +20,24 @@ class Book < ApplicationRecord
   #     "lovely #{matched}"
   #   end
   # end
-  # before_validation :add_lovely_to_cat
+  before_validation :add_lovely_to_cat
 
-  # def add_lovely_to_cat
-  #   self.name = self.name.gsub(/Cat/) do |matched|
-  #     "lovely #{matched}"
-  #   end
-  # end
+  def add_lovely_to_cat
+    self.name = self.name.gsub(/Cat/) do |matched|
+      "lovely #{matched}"
+    end
+  end
 
   after_destroy do
     Rails.logger.info "Book is delete: #{self.attributes}"
+  end
+
+  after_destroy :if => :high_price? do
+    Rails.logger.warn "Book with high price is deleted: #{self.attributes}"
+    Rails.logger.warn "Please check!!"
+  end
+
+  def high_price?
+    price >= 5000
   end
 end
